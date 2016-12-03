@@ -31,6 +31,7 @@ public class VotesController extends AdminBaseController {
         return pc("/votes/" + page);
     }
 
+    /** 对投票活动进行分页列表 **/
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     @ResponseBody
     public Page<Vote> page(@RequestParam String order, @RequestParam Integer limit, @RequestParam Integer offset) {
@@ -39,6 +40,7 @@ public class VotesController extends AdminBaseController {
         return voteRepo.findByStatus(pageablea, Status.ACTIVE);
     }
 
+    /** 新增投票活动 **/
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @ResponseBody
     public Object save(VoteForm form) {
@@ -51,6 +53,7 @@ public class VotesController extends AdminBaseController {
         return ok("保存成功");
     }
 
+    /** 调到跟新投票活动页面 **/
     @RequestMapping(value = "/edit/{id}", method = RequestMethod.GET)
     public String edit(@PathVariable Long id) { 
         Vote vote = voteRepo.findOne(id);
@@ -61,6 +64,7 @@ public class VotesController extends AdminBaseController {
         return pc("/votes/edit");
     }
 
+    /** 更新投票活动 **/
     @RequestMapping(value = "/update/{id}", method = RequestMethod.POST)
     @ResponseBody
     public Object update(@PathVariable Long id, VoteForm form) {
@@ -75,6 +79,7 @@ public class VotesController extends AdminBaseController {
         return ok("修改成功");
     }
 
+    /** 删除投票活动 **/
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
     @ResponseBody
     public Object delete(@PathVariable Long id) {
@@ -86,6 +91,7 @@ public class VotesController extends AdminBaseController {
         return ok("删除成功");
     }
 
+    /** 预览投票活动 **/
     @RequestMapping(value = "/view/{id}", method = RequestMethod.GET)
     public String view(@PathVariable Long id) {
         Vote vote = voteRepo.findOne(id);

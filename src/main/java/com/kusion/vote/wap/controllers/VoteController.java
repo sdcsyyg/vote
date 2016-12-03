@@ -33,6 +33,7 @@ public class VoteController extends AccessController {
     @Autowired
     VoteResultRepo voteResultRepo;
 
+    /** 进入投票活动页面，列出手游选手并排名 **/
     @RequestMapping("vote/{voteId}")
     public String vote(@PathVariable Long voteId) {
         Vote v = voteRepo.findByIdAndStatus(voteId, Status.ACTIVE);
@@ -57,6 +58,7 @@ public class VoteController extends AccessController {
                 }
             }
         }
+        /** 冒泡排序 **/
         Competitor tc = null;
         for(int i = 0; i < (competitors.size()-1); i++) {
             for(int j = i+1; j < competitors.size(); j++) {
@@ -92,6 +94,7 @@ public class VoteController extends AccessController {
         return "/wap/votes/detail";
     }
 
+    /** 进入报名页面 **/
     @RequestMapping("baoming/{voteId}")
     public String baoming(@PathVariable Long voteId) {
         Vote v = voteRepo.findByIdAndStatus(voteId, Status.ACTIVE);
@@ -102,6 +105,7 @@ public class VoteController extends AccessController {
         return "/wap/votes/baoming";
     }
 
+    /** 实现报名逻辑 **/
     @RequestMapping(value = "/baoming/{vid}", method = RequestMethod.POST)
     @ResponseBody
     public Object baoming(@PathVariable Long vid, CompetitorForm form) {
@@ -129,6 +133,7 @@ public class VoteController extends AccessController {
         return ok("报名成功");
     }
 
+    /** 进入投票页面 **/
     @RequestMapping("/vote/{voteId}/competitor/{competitorId}")
     public String votePage(@PathVariable Long voteId,@PathVariable Long competitorId) {
         Vote v = voteRepo.findByIdAndStatus(voteId, Status.ACTIVE);
@@ -160,7 +165,7 @@ public class VoteController extends AccessController {
     }
 
     /**
-     * 赞成
+     * 赞成票
      */
     @RequestMapping(value = "/addIn/{voteId}/{competitorId}", method = RequestMethod.POST)
     @ResponseBody
@@ -178,7 +183,7 @@ public class VoteController extends AccessController {
     }
 
     /**
-     * 反对
+     * 反对票
      */
     @RequestMapping(value = "/addOut/{voteId}/{competitorId}", method = RequestMethod.POST)
     @ResponseBody
@@ -214,7 +219,7 @@ public class VoteController extends AccessController {
     }
 
     /**
-     * 打分
+     * 打分票
      */
     @RequestMapping(value = "/addScore/{voteId}/{competitorId}/{score}", method = RequestMethod.POST)
     @ResponseBody
