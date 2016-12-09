@@ -29,6 +29,8 @@ public class Vote extends AbstractModel {
     /** 分制：针对打分形式的 **/
     private int scoreSystem = 100;
 
+    private boolean finished = true;
+
     public void addCompetitor(Competitor c) {
         this.competitors.add(c);
     }
@@ -76,6 +78,16 @@ public class Vote extends AbstractModel {
 
     public void setVoteType(String voteType) {
         this.voteType = voteType;
+    }
+
+
+    public boolean isFinished() {
+        return finished;
+    }
+
+
+    public void setFinished(boolean finished) {
+        this.finished = finished;
     }
 
 }

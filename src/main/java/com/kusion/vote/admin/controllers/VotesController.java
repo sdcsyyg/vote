@@ -91,6 +91,30 @@ public class VotesController extends AdminBaseController {
         return ok("删除成功");
     }
 
+    /** 停止投票 **/
+    @RequestMapping(value = "/finish/{id}", method = RequestMethod.GET)
+    @ResponseBody
+    public Object finish(@PathVariable Long id) {
+        Vote vote = voteRepo.findOne(id);
+        if(vote != null){
+           vote.setFinished(true);
+           voteRepo.save(vote);
+        }
+        return ok("删除成功");
+    }
+
+    /** 开启投票 **/
+    @RequestMapping(value = "/start/{id}", method = RequestMethod.GET)
+    @ResponseBody
+    public Object start(@PathVariable Long id) {
+        Vote vote = voteRepo.findOne(id);
+        if(vote != null){
+           vote.setFinished(false);
+           voteRepo.save(vote);
+        }
+        return ok("删除成功");
+    }
+
     /** 预览投票活动 **/
     @RequestMapping(value = "/view/{id}", method = RequestMethod.GET)
     public String view(@PathVariable Long id) {

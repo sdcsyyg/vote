@@ -1,4 +1,4 @@
-#set($title = "在线表决器")
+#set($title = "在线表决系统")
 #set($preview = "/images/preview")
 #set($resize = "/images/resize")
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />

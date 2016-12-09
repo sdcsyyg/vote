@@ -27,8 +27,14 @@
 <body>
     <header class="aui-bar aui-bar-nav">
         <a class="aui-pull-left" href="/wap/index">返回</a>
-        <div class="aui-title">${vote.name}</div>
-        <a class="aui-pull-right" href="/wap/votes/baoming/${vote.id}">报名</a>
+        <div class="aui-title">${vote.name}
+            #if($vote.finished)
+                <span class="aui-lozenge aui-warning">（未开启投票）</span>
+            #end
+        </div>
+        #if($vote.finished)
+            <a class="aui-pull-right" href="/wap/votes/baoming/${vote.id}">报名</a>
+        #end
     </header>
     <!--分类导航-->
     <div class="nav-section">
@@ -37,7 +43,23 @@
             <ul class="aui-list-view" id="tpl-agent-con">
                 #foreach($tompetitor in $cmpetitors)
                     <li class="aui-list-view-cell">
-                        <a class="hd" href="/wap/votes/vote/${vote.id}/competitor/${tompetitor.id}">${tompetitor.name}【
+
+                        #if(!$vote.finished)
+                            ${tompetitor.name}【
+                            #if(${vote.voteType} == 'CHECK')
+                            ${tompetitor.checkInCount}票赞成；
+                            ${tompetitor.checkOutCount}票反对
+                            #elseif(${vote.voteType} == 'VOTE')
+                            ${tompetitor.voteCount}票
+                            #elseif(${vote.voteType} == 'SCORE')
+                                #if($!{tompetitor.average})
+                                    $!{tompetitor.average}
+                                #else
+                                    0.00
+                                #end 分(平均分)
+                            #end】
+                        #else
+                            <a class="hd" href="/wap/votes/vote/${vote.id}/competitor/${tompetitor.id}">${tompetitor.name}【
                             #if(${vote.voteType} == 'CHECK')
                             ${tompetitor.checkInCount}票赞成；
                             ${tompetitor.checkOutCount}票反对
@@ -50,6 +72,7 @@
                                     0.00
                                 #end 分(平均分)
                             #end】</a>
+                        #end
                     </li>
                 #end
             </ul>

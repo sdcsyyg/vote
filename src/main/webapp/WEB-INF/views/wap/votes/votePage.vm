@@ -46,10 +46,44 @@
             #if(${vote.voteType} == 'CHECK')截至目前，<font color="blue" size="5px">${competitor.name}</font>一共获得:<br/>
             <font color="GREEN" size="10px">${competitor.checkInCount}</font>票赞成<br/>
             <font color="RED" size="10px">${competitor.checkOutCount}</font>票反对<br/><div id="hr"></div>
+
+            <header class="aui-page-header">
+                <div class="aui-page-header-inner">
+                    <div class="aui-page-header-main">
+                        <h1 style="text-align: center;color: red;">请填写投票者电话(必填)</h1>
+                    </div>
+                </div>
+            </header>
+            <table class="aui">
+                <tbody>
+                    <tr>
+                        <td headers="name"  style="font-size: 20px;padding-bottom: 19px;">电话：</td>
+                        <td headers="type"><input class="text medium-field" id="phoneIpt" name="phone" type="text"/></td>
+                    </tr>
+                </tbody>
+            </table><div id="hr"></div>
+
             <button id="zanchengBtn" type="button" class="btn btn-success" >支持TA</button>&nbsp;&nbsp;&nbsp;&nbsp;
             <button id="fanduiBtn" type="button" class="btn btn-success" >不支持TA</button>
             #elseif(${vote.voteType} == 'VOTE')截至目前，<font color="blue" size="5px">${competitor.name}</font>一共获得:<br/>
             <font color="GREEN" size="10px">${competitor.voteCount}</font>票<br/><div id="hr"></div>
+
+            <header class="aui-page-header">
+                <div class="aui-page-header-inner">
+                    <div class="aui-page-header-main">
+                        <h1 style="text-align: center;color: red;">请填写投票者电话(必填)</h1>
+                    </div>
+                </div>
+            </header>
+            <table class="aui">
+                <tbody>
+                    <tr>
+                        <td headers="name"  style="font-size: 20px;padding-bottom: 19px;">电话：</td>
+                        <td headers="type"><input class="text medium-field" id="phoneIpt" name="phone" type="text"/></td>
+                    </tr>
+                </tbody>
+            </table><div id="hr"></div>
+
             <button id="voteBtn" type="button" class="btn btn-success" >投TA一票</button>
             #elseif(${vote.voteType} == 'SCORE')截至目前，<font color="blue" size="5px">${competitor.name}</font>的平均分为:<br/>
             <font color="GREEN" size="10px">
@@ -58,8 +92,25 @@
                 #else
                     0.00
                 #end
-            </font>分<br/><div id="hr"></div>现在，请为
+            </font>分<br/><div id="hr"></div>
+
+            <header class="aui-page-header">
+                <div class="aui-page-header-inner">
+                    <div class="aui-page-header-main">
+                        <h1 style="text-align: center;color: red;">请填写投票者电话(必填)</h1>
+                    </div>
+                </div>
+            </header>
+            <table class="aui">
+                <tbody>
+                    <tr>
+                        <td headers="name"  style="font-size: 20px;padding-bottom: 19px;">电话：</td>
+                        <td headers="type"><input class="text medium-field" id="phoneIpt" name="phone" type="text"/></td>
+                    </tr>
+                </tbody>
+            </table><div id="hr"></div>现在，请为
             <font color="blue" size="5px">${competitor.name}</font>打分：<br />
+
             <input id="scoreIpt" name="score" type="text"/>
             <button id="scoreBtn" type="button" class="btn btn-success" >确认打分</button>
             #end

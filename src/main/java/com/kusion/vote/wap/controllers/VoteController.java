@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.kusion.vote.application.models.Competitor;
 import com.kusion.vote.application.models.Vote;
+import com.kusion.vote.application.models.VoteRecord;
 import com.kusion.vote.application.models.VoteResult;
 import com.kusion.vote.application.repos.CompetitorRepo;
+import com.kusion.vote.application.repos.VoteRecordRepo;
 import com.kusion.vote.application.repos.VoteRepo;
 import com.kusion.vote.application.repos.VoteResultRepo;
 import com.kusion.vote.common.controllers.AccessController;
@@ -32,6 +34,9 @@ public class VoteController extends AccessController {
 
     @Autowired
     VoteResultRepo voteResultRepo;
+
+    @Autowired
+    VoteRecordRepo voteRecordRepo;
 
     /** 进入投票活动页面，列出手游选手并排名 **/
     @RequestMapping("vote/{voteId}")
@@ -101,6 +106,9 @@ public class VoteController extends AccessController {
         if(v == null) {
             return "/wap/votes/error";
         }
+        if(v.isFinished()) {
+            return "/wap/votes/error";
+        }
         request().setAttribute("vote", v);
         return "/wap/votes/baoming";
     }
@@ -111,7 +119,10 @@ public class VoteController extends AccessController {
     public Object baoming(@PathVariable Long vid, CompetitorForm form) {
         Vote v = voteRepo.findByIdAndStatus(vid, Status.ACTIVE);
         if(v == null) {
-            return "/wap/votes/error";
+            return failure("活动不存在");
+        }
+        if(!v.isFinished()) {
+            return failure("报名已关闭!");
         }
         Competitor c = new Competitor();
         c.setName(form.getName());
@@ -125,7 +136,7 @@ public class VoteController extends AccessController {
         }
 
         if(v.getCompetitors().contains(c)) {
-            return ok("您已经报过名了!");
+            return failure("您已经报过名了!");
         }
 
         v.addCompetitor(c);
@@ -138,6 +149,9 @@ public class VoteController extends AccessController {
     public String votePage(@PathVariable Long voteId,@PathVariable Long competitorId) {
         Vote v = voteRepo.findByIdAndStatus(voteId, Status.ACTIVE);
         if(v == null) {
+            return "/wap/votes/error";
+        }
+        if(v.isFinished()) {
             return "/wap/votes/error";
         }
         Competitor c = competitorRepo.findOne(competitorId);
@@ -167,33 +181,58 @@ public class VoteController extends AccessController {
     /**
      * 赞成票
      */
-    @RequestMapping(value = "/addIn/{voteId}/{competitorId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/addIn/{voteId}/{competitorId}/{phone}", method = RequestMethod.POST)
     @ResponseBody
-    public Object addIn(@PathVariable Long voteId, @PathVariable Long competitorId) {
+    public Object addIn(@PathVariable Long voteId, @PathVariable Long competitorId, @PathVariable String phone) {
         Vote v = voteRepo.findByIdAndStatus(voteId, Status.ACTIVE);
+
         Competitor c = competitorRepo.findOne(competitorId);
         VoteResult vr = testVote(v, c);
         if(vr == null) {
-            return ok("表决失败");
+            return failure("表决失败");
         }
+
+        if(v.isFinished()) {
+            return failure("表决通过关闭");
+        }
+
+        VoteRecord vrc = voteRecordRepo.findByVoteAndCompetitorAndPhone(v, c, phone);
+        if(vrc != null) {
+            return failure("您已经表决过了");
+        }
+        vrc = new VoteRecord(v, c, phone);
+        vrc.setCheckIn(true);
+        voteRecordRepo.save(vrc);
+
         // TODO ：枷锁，考虑并发
         vr.setCheckInCount(vr.getCheckInCount() + 1);
         voteResultRepo.save(vr);
+
         return ok("表决成功");
     }
 
     /**
      * 反对票
      */
-    @RequestMapping(value = "/addOut/{voteId}/{competitorId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/addOut/{voteId}/{competitorId}/{phone}", method = RequestMethod.POST)
     @ResponseBody
-    public Object addOut(@PathVariable Long voteId, @PathVariable Long competitorId) {
+    public Object addOut(@PathVariable Long voteId, @PathVariable Long competitorId, @PathVariable String phone) {
         Vote v = voteRepo.findByIdAndStatus(voteId, Status.ACTIVE);
         Competitor c = competitorRepo.findOne(competitorId);
         VoteResult vr = testVote(v, c);
         if(vr == null) {
             return ok("表决失败");
         }
+        if(v.isFinished()) {
+            return failure("表决通过关闭");
+        }
+        VoteRecord vrc = voteRecordRepo.findByVoteAndCompetitorAndPhone(v, c, phone);
+        if(vrc != null) {
+            return failure("您已经表决过了");
+        }
+        vrc = new VoteRecord(v, c, phone);
+        vrc.setCheckOut(true);
+        voteRecordRepo.save(vrc);
         // TODO ：枷锁，考虑并发
         vr.setCheckOutCount(vr.getCheckOutCount() + 1);
         voteResultRepo.save(vr);
@@ -203,15 +242,25 @@ public class VoteController extends AccessController {
     /**
      * 投票
      */
-    @RequestMapping(value = "/addVote/{voteId}/{competitorId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/addVote/{voteId}/{competitorId}/{phone}", method = RequestMethod.POST)
     @ResponseBody
-    public Object addVote(@PathVariable Long voteId, @PathVariable Long competitorId) {
+    public Object addVote(@PathVariable Long voteId, @PathVariable Long competitorId, @PathVariable String phone) {
         Vote v = voteRepo.findByIdAndStatus(voteId, Status.ACTIVE);
         Competitor c = competitorRepo.findOne(competitorId);
         VoteResult vr = testVote(v, c);
         if(vr == null) {
             return ok("表决失败");
         }
+        if(v.isFinished()) {
+            return failure("表决通过关闭");
+        }
+        VoteRecord vrc = voteRecordRepo.findByVoteAndCompetitorAndPhone(v, c, phone);
+        if(vrc != null) {
+            return failure("您已经表决过了");
+        }
+        vrc = new VoteRecord(v, c, phone);
+        vrc.setVoting(true);
+        voteRecordRepo.save(vrc);
         // TODO ：枷锁，考虑并发
         vr.setVoteCount(vr.getVoteCount() + 1);
         voteResultRepo.save(vr);
@@ -221,15 +270,25 @@ public class VoteController extends AccessController {
     /**
      * 打分票
      */
-    @RequestMapping(value = "/addScore/{voteId}/{competitorId}/{score}", method = RequestMethod.POST)
+    @RequestMapping(value = "/addScore/{voteId}/{competitorId}/{score}/{phone}", method = RequestMethod.POST)
     @ResponseBody
-    public Object addScore(@PathVariable Long voteId, @PathVariable Long competitorId, @PathVariable String score) {
+    public Object addScore(@PathVariable Long voteId, @PathVariable Long competitorId, @PathVariable String score, @PathVariable String phone) {
         Vote v = voteRepo.findByIdAndStatus(voteId, Status.ACTIVE);
         Competitor c = competitorRepo.findOne(competitorId);
         VoteResult vr = testVote(v, c);
-        if(vr == null) {
-            return ok("表决失败");
+        if(vr == null || Double.valueOf(score) > v.getScoreSystem()) {
+            return ok("表决失败,请填写正确的参数");
         }
+        if(v.isFinished()) {
+            return failure("表决通过关闭");
+        }
+        VoteRecord vrc = voteRecordRepo.findByVoteAndCompetitorAndPhone(v, c, phone);
+        if(vrc != null) {
+            return failure("您已经表决过了");
+        }
+        vrc = new VoteRecord(v, c, phone);
+        vrc.setScore(true);
+        voteRecordRepo.save(vrc);
         // TODO ：枷锁，考虑并发
         if(vr.getScoreCount() == null || vr.getScoreCount() == 0) {
             vr.setScoreCount(Double.valueOf(score));
