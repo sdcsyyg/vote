@@ -32,7 +32,7 @@ $(document).ready(function() {
         var voteId = $('#temp').attr('vid');
         var competitorId = $('#temp').attr('cid');
 
-        var phone = $('#nameIpt').val();
+        var phone = $('#phoneIpt').val();
 
         if(!phone || !/^1\d{10}$/.test(phone)) {
             alert('请填写正确的电话号码');
@@ -55,7 +55,7 @@ $(document).ready(function() {
         var voteId = $('#temp').attr('vid');
         var competitorId = $('#temp').attr('cid');
 
-        var phone = $('#nameIpt').val();
+        var phone = $('#phoneIpt').val();
 
         if(!phone || !/^1\d{10}$/.test(phone)) {
             alert('请填写正确的电话号码');
@@ -78,7 +78,7 @@ $(document).ready(function() {
         var voteId = $('#temp').attr('vid');
         var competitorId = $('#temp').attr('cid');
 
-        var phone = $('#nameIpt').val();
+        var phone = $('#phoneIpt').val();
 
         if(!phone || !/^1\d{10}$/.test(phone)) {
             alert('请填写正确的电话号码');
