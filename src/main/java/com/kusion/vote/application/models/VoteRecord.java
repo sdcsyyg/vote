@@ -30,6 +30,8 @@ public class VoteRecord extends AbstractModel {
 
     private String phone;
 
+    public VoteRecord() {}
+
     public VoteRecord(Vote v, Competitor c, String phone) {
         this.vote = v;
         this.competitor = c;

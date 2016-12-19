@@ -4,9 +4,9 @@ $(document).ready(function() {
         var competitorId = $('#temp').attr('cid');
         var score = $('#scoreIpt').val();
 
-        var phone = $('#nameIpt').val();
+        var phone = $('#phoneIpt').val();
 
-        if(!phone || !/^1\d{10}$/.test(phone) ) {
+        if(!phone || !(/^1\d{10}$/.test(phone)) ) {
             alert('请填写正确的电话号码');
             return;
         }
@@ -20,7 +20,11 @@ $(document).ready(function() {
 
         $.post(url, null, function(result) {
             alert(result.msg);
-            location.href = '/wap/votes/vote/' + voteId + '/competitor/' + competitorId;
+            if(result.success) {
+                location.href = '/wap/votes/vote/' + voteId + '/competitor/' + competitorId;
+            }else {
+                location.href = '/wap/votes/vote/' + voteId;
+            }
         }, 'json');
     });
 
@@ -39,7 +43,11 @@ $(document).ready(function() {
 
         $.post(url, null, function(result) {
             alert(result.msg);
-            location.href = '/wap/votes/vote/' + voteId + '/competitor/' + competitorId;
+            if(result.success) {
+                location.href = '/wap/votes/vote/' + voteId + '/competitor/' + competitorId;
+            }else {
+                location.href = '/wap/votes/vote/' + voteId;
+            }
         }, 'json');
     });
 
@@ -58,7 +66,11 @@ $(document).ready(function() {
 
         $.post(url, null, function(result) {
             alert(result.msg);
-            location.href = '/wap/votes/vote/' + voteId + '/competitor/' + competitorId;
+            if(result.success) {
+                location.href = '/wap/votes/vote/' + voteId + '/competitor/' + competitorId;
+            }else {
+                location.href = '/wap/votes/vote/' + voteId;
+            }
         }, 'json');
     });
 
@@ -77,7 +89,11 @@ $(document).ready(function() {
 
         $.post(url, null, function(result) {
             alert(result.msg);
-            location.href = '/wap/votes/vote/' + voteId + '/competitor/' + competitorId;
+            if(result.success) {
+                location.href = '/wap/votes/vote/' + voteId + '/competitor/' + competitorId;
+            }else {
+                location.href = '/wap/votes/vote/' + voteId;
+            }
         }, 'json');
     });
 

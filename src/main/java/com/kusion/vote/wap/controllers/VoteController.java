@@ -106,7 +106,8 @@ public class VoteController extends AccessController {
         if(v == null) {
             return "/wap/votes/error";
         }
-        if(v.isFinished()) {
+        /* 开始投票后，系统将停止报名 */
+        if(!v.isFinished()) {
             return "/wap/votes/error";
         }
         request().setAttribute("vote", v);

@@ -100,7 +100,7 @@ public class VotesController extends AdminBaseController {
            vote.setFinished(true);
            voteRepo.save(vote);
         }
-        return ok("删除成功");
+        return ok("停止成功");
     }
 
     /** 开启投票 **/
@@ -112,7 +112,7 @@ public class VotesController extends AdminBaseController {
            vote.setFinished(false);
            voteRepo.save(vote);
         }
-        return ok("删除成功");
+        return ok("开启成功");
     }
 
     /** 预览投票活动 **/

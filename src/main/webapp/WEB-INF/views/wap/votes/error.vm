@@ -26,7 +26,14 @@
         </div>
     </header>
     <div class="content">
-        <h1 class="peter-river">您访问的活动不存在 </h1>
+        <div class="aui-tips" id="tips-1">
+            <div class="aui-tips-content aui-ellipsis-1" >
+                <i class="aui-iconfont aui-icon-warnfill"></i>访问路径或者参数不对
+            </div>
+        </div>
+    </div>
+    <div class="content">
+        <p><div class="aui-btn aui-btn-warning aui-btn-block" onclick="history.back();">返回上一页</div></p>
     </div>
 </body>
 </html>

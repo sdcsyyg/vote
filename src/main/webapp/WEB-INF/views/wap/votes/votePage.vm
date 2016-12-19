@@ -50,7 +50,7 @@
             <header class="aui-page-header">
                 <div class="aui-page-header-inner">
                     <div class="aui-page-header-main">
-                        <h1 style="text-align: center;color: red;">请填写投票者电话(必填)</h1>
+                        <h1 style="text-align: center;color: red;">请填写您的电话(必填)</h1>
                     </div>
                 </div>
             </header>
@@ -58,7 +58,7 @@
                 <tbody>
                     <tr>
                         <td headers="name"  style="font-size: 20px;padding-bottom: 19px;">电话：</td>
-                        <td headers="type"><input class="text medium-field" id="phoneIpt" name="phone" type="text"/></td>
+                        <td headers="type"><input class="text medium-field" id="phoneIpt" name="phone" type="text" size="15"/></td>
                     </tr>
                 </tbody>
             </table><div id="hr"></div>
@@ -71,7 +71,7 @@
             <header class="aui-page-header">
                 <div class="aui-page-header-inner">
                     <div class="aui-page-header-main">
-                        <h1 style="text-align: center;color: red;">请填写投票者电话(必填)</h1>
+                        <h1 style="text-align: center;color: red;">请填写您的电话(必填)</h1>
                     </div>
                 </div>
             </header>
@@ -97,7 +97,7 @@
             <header class="aui-page-header">
                 <div class="aui-page-header-inner">
                     <div class="aui-page-header-main">
-                        <h1 style="text-align: center;color: red;">请填写投票者电话(必填)</h1>
+                        <h1 style="text-align: center;color: red;">请填写您的电话(必填)</h1>
                     </div>
                 </div>
             </header>
