@@ -204,7 +204,7 @@ public class VoteController extends AccessController {
                 if(voteForm.isAddIn()) {
                     vr.setCheckInCount(vr.getCheckInCount() + 1);
                 } else if(voteForm.isAddOut()) {
-                    vr.setCheckInCount(vr.getCheckOutCount() + 1);
+                    vr.setCheckOutCount(vr.getCheckOutCount() + 1);
                 }
                 break;
             case Constants.VOTE_TYPE_VOTE:

@@ -18,8 +18,18 @@ $(document).ready(function() {
         }
 
         $.post($form.attr('action'), $form.serialize(), function(result) {
-            alert(result.msg);
-            location.href = '/wap/votes/vote/' + vid;
+            if(result.success) {
+                $("#success").attr('style', 'display:black');
+                setTimeout(function(){
+                    $("#success").attr('style', 'display:none');
+                    location.href = '/wap/votes/vote/' + vid;
+                },2000)
+            } else {
+                $("#error").attr('style', 'display:black');
+                setTimeout(function(){
+                    $("#error").attr('style', 'display:none');
+                },2000)
+            }
         }, 'json');
     });
 

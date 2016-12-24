@@ -7,12 +7,12 @@ $(document).ready(function() {
         var phone = $('#phoneIpt').val();
 
         if(!phone || !(/^1\d{10}$/.test(phone)) ) {
-            alert('请填写正确的电话号码');
+            $('#phone-error-dialog').removeClass('aui-hidden');
             return;
         }
 
         if(!score || !/^\d+(\.\d+)?$/.test(score)) {
-            alert('请填写正确的分数');
+            $('#score-error-dialog').removeClass('aui-hidden');
             return;
         }
 
@@ -25,11 +25,14 @@ $(document).ready(function() {
             voteType: 'SCORE',
             phone: phone
         }, function(result) {
-            alert(result.msg);
             if(result.success) {
-                location.href = '/wap/votes/vote/' + voteId + '/competitor/' + competitorId;
+                $("#success").attr('style', 'display:black');
+                setTimeout(function(){
+                    $("#success").attr('style', 'display:none');
+                    location.href = '/wap/votes/vote/' + voteId + '/competitor/' + competitorId;
+                },2000)
             }else {
-                location.href = '/wap/votes/vote/' + voteId;
+                $('#result-error-dialog').removeClass('aui-hidden');
             }
         }, 'json');
     });
@@ -41,7 +44,7 @@ $(document).ready(function() {
         var phone = $('#phoneIpt').val();
 
         if(!phone || !/^1\d{10}$/.test(phone)) {
-            alert('请填写正确的电话号码');
+            $('#phone-error-dialog').removeClass('aui-hidden');
             return;
         }
 
@@ -52,13 +55,17 @@ $(document).ready(function() {
             competitorId: competitorId,
             voteType: 'CHECK',
             addIn: true,
+            addOut: false,
             phone: phone
         }, function(result) {
-            alert(result.msg);
             if(result.success) {
-                location.href = '/wap/votes/vote/' + voteId + '/competitor/' + competitorId;
+                $("#success").attr('style', 'display:black');
+                setTimeout(function(){
+                    $("#success").attr('style', 'display:none');
+                    location.href = '/wap/votes/vote/' + voteId + '/competitor/' + competitorId;
+                },2000)
             }else {
-                location.href = '/wap/votes/vote/' + voteId;
+                $('#result-error-dialog').removeClass('aui-hidden');
             }
         }, 'json');
     });
@@ -70,7 +77,7 @@ $(document).ready(function() {
         var phone = $('#phoneIpt').val();
 
         if(!phone || !/^1\d{10}$/.test(phone)) {
-            alert('请填写正确的电话号码');
+            $('#phone-error-dialog').removeClass('aui-hidden');
             return;
         }
 
@@ -81,13 +88,17 @@ $(document).ready(function() {
             competitorId: competitorId,
             voteType: 'CHECK',
             addOut: true,
+            addIn: false,
             phone: phone
         }, function(result) {
-            alert(result.msg);
             if(result.success) {
-                location.href = '/wap/votes/vote/' + voteId + '/competitor/' + competitorId;
+                $("#success").attr('style', 'display:black');
+                setTimeout(function(){
+                    $("#success").attr('style', 'display:none');
+                    location.href = '/wap/votes/vote/' + voteId + '/competitor/' + competitorId;
+                },2000)
             }else {
-                location.href = '/wap/votes/vote/' + voteId;
+                $('#result-error-dialog').removeClass('aui-hidden');
             }
         }, 'json');
     });
@@ -99,7 +110,7 @@ $(document).ready(function() {
         var phone = $('#phoneIpt').val();
 
         if(!phone || !/^1\d{10}$/.test(phone)) {
-            alert('请填写正确的电话号码');
+            $('#phone-error-dialog').removeClass('aui-hidden');
             return;
         }
 
@@ -111,13 +122,26 @@ $(document).ready(function() {
             voteType: 'VOTE',
             phone: phone
         }, function(result) {
-            alert(result.msg);
             if(result.success) {
-                location.href = '/wap/votes/vote/' + voteId + '/competitor/' + competitorId;
+                $("#success").attr('style', 'display:black');
+                setTimeout(function(){
+                    $("#success").attr('style', 'display:none');
+                    location.href = '/wap/votes/vote/' + voteId + '/competitor/' + competitorId;
+                },2000)
             }else {
-                location.href = '/wap/votes/vote/' + voteId;
+                $('#result-error-dialog').removeClass('aui-hidden');
             }
         }, 'json');
+    });
+
+    $('.confirmbtn').on('click', function() {
+        $('#phone-error-dialog').addClass('aui-hidden');
+    });
+    $('.confirmbtn-score').on('click', function() {
+        $('#score-error-dialog').addClass('aui-hidden');
+    });
+    $('.confirmbtn-result').on('click', function() {
+        $('#result-error-dialog').addClass('aui-hidden');
     });
 
 });

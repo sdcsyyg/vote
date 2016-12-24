@@ -14,7 +14,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import com.kusion.vote.application.models.Config;
-import com.kusion.vote.application.models.User;
 import com.kusion.vote.application.repos.ConfigRepo;
 import com.kusion.vote.common.configs.Constants;
 
@@ -80,7 +79,4 @@ public class BaseController extends HandlerInterceptorAdapter {
         return request().getSession();
     }
 
-    public User getLoggedUser() {
-        return (User) session().getAttribute(Constants.SESSION_CURRENT_USER_KEY);
-    }
 }

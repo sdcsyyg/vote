@@ -36,6 +36,40 @@
     </style>
 </head>
 <body>
+    <div class="aui-toast" style="display:none" id="success">
+        <i class="aui-iconfont aui-icon-check"></i>
+        <div class="aui-toast-content" id="success-inner">表决成功</div>
+    </div>
+    <div class="aui-dialog aui-hidden" id="phone-error-dialog">
+        <div class="aui-dialog-header">参数错误</div>
+        <div class="aui-dialog-body aui-text-left">请填写正确的电话号码
+        </div>
+        <div class="aui-dialog-footer">
+            <div class="aui-dialog-btn aui-text-danger confirmbtn" tapmode>取消</div>
+            <div class="aui-dialog-btn aui-text-info confirmbtn" tapmode>确定</div>
+        </div>
+    </div>
+
+    <div class="aui-dialog aui-hidden" id="score-error-dialog">
+        <div class="aui-dialog-header">参数错误</div>
+        <div class="aui-dialog-body aui-text-left">请填写正确的分数
+        </div>
+        <div class="aui-dialog-footer">
+            <div class="aui-dialog-btn aui-text-danger confirmbtn-score" tapmode>取消</div>
+            <div class="aui-dialog-btn aui-text-info confirmbtn-score" tapmode>确定</div>
+        </div>
+    </div>
+
+    <div class="aui-dialog aui-hidden" id="result-error-dialog">
+        <div class="aui-dialog-header">表决错误</div>
+        <div id="result-error-inner" class="aui-dialog-body aui-text-left">表决失败,请填写正确的参数或者您已经表决过了！
+        </div>
+        <div class="aui-dialog-footer">
+            <div class="aui-dialog-btn aui-text-danger confirmbtn-result" tapmode>取消</div>
+            <div class="aui-dialog-btn aui-text-info confirmbtn-result" tapmode>确定</div>
+        </div>
+    </div>
+
     <header class="aui-bar aui-bar-nav">
         <a class="aui-pull-left" href="/wap/votes/vote/${vote.id}">返回</a>
         <div class="aui-title">${competitor.name} - ${vote.name}</div>

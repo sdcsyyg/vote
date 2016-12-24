@@ -83,20 +83,9 @@
     <mvc:interceptors>
         <bean class="com.kusion.vote.common.controllers.BaseController"/>
         <mvc:interceptor>
-            <mvc:mapping path="/ma/**"/>
-            <bean class="com.kusion.vote.common.controllers.RestController" />
-        </mvc:interceptor>
-        <mvc:interceptor>
             <mvc:mapping path="/admin/**"/>
             <mvc:exclude-mapping path="/admin/login"/>
             <bean class="com.kusion.vote.admin.interceptors.LoginInterceptor" />
-        </mvc:interceptor>
-        <mvc:interceptor>
-            <mvc:mapping path="/"/>
-            <mvc:mapping path="/wap/**"/>
-            <mvc:exclude-mapping path="/wap/oauth/*"/>
-            <mvc:exclude-mapping path="/wap/article/*"/>
-            <bean class="com.kusion.vote.ext.wx.interceptors.LoginInterceptor" />
         </mvc:interceptor>
     </mvc:interceptors>
 </beans>

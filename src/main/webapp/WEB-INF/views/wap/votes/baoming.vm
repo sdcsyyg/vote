@@ -25,6 +25,16 @@
     </style>
 </head>
 <body>
+
+    <div class="aui-toast" style="display:none" id="success">
+        <i class="aui-iconfont aui-icon-check"></i>
+        <div class="aui-toast-content" id="success-inner">报名成功</div>
+    </div>
+    <div class="aui-toast"  style="display:none" id="error">
+        <div class="aui-iconfont aui-icon-close"></div>
+        <div class="aui-toast-content" id="error-inner">报名失败</div>
+    </div>
+
     <header class="aui-bar aui-bar-nav">
         <a class="aui-pull-left" href="/wap/votes/vote/${vote.id}">返回</a>
         <div class="aui-title">报名-${vote.name}</div>
