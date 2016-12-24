@@ -2,6 +2,8 @@ package com.kusion.vote.wap.controllers;
 
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,9 +20,11 @@ import com.kusion.vote.application.repos.CompetitorRepo;
 import com.kusion.vote.application.repos.VoteRecordRepo;
 import com.kusion.vote.application.repos.VoteRepo;
 import com.kusion.vote.application.repos.VoteResultRepo;
+import com.kusion.vote.common.configs.Constants;
 import com.kusion.vote.common.controllers.AccessController;
 import com.kusion.vote.common.enums.Status;
 import com.kusion.vote.wap.forms.CompetitorForm;
+import com.kusion.vote.wap.forms.VotingForm;
 
 @Controller
 @RequestMapping("/wap/votes")
@@ -63,27 +67,28 @@ public class VoteController extends AccessController {
                 }
             }
         }
+
         /** 冒泡排序 **/
         Competitor tc = null;
         for(int i = 0; i < (competitors.size()-1); i++) {
             for(int j = i+1; j < competitors.size(); j++) {
                 switch (v.getVoteType()) {
-                    case "CHECK":
-                        if(competitors.get(i).getCheckInCount() < competitors.get(j).getCheckInCount()) {
+                    case Constants.VOTE_TYPE_CHECK:
+                        if(competitors.get(i).compareTo(competitors.get(j), Constants.VOTE_TYPE_CHECK) < 0) {
                             tc = competitors.get(i);
                             competitors.set(i, competitors.get(j));
                             competitors.set(j, tc);
                         }
                         break;
-                    case "VOTE":
-                        if(competitors.get(i).getVoteCount() < competitors.get(j).getVoteCount()) {
+                    case Constants.VOTE_TYPE_VOTE:
+                        if(competitors.get(i).compareTo(competitors.get(j), Constants.VOTE_TYPE_VOTE) < 0) {
                             tc = competitors.get(i);
                             competitors.set(i, competitors.get(j));
                             competitors.set(j, tc);
                         }
                         break;
-                    case "SCORE":
-                        if(competitors.get(i).getAverage() < competitors.get(j).getAverage()) {
+                    case Constants.VOTE_TYPE_SCORE:
+                        if(competitors.get(i).compareTo(competitors.get(j), Constants.VOTE_TYPE_SCORE) < 0) {
                             tc = competitors.get(i);
                             competitors.set(i, competitors.get(j));
                             competitors.set(j, tc);
@@ -94,6 +99,7 @@ public class VoteController extends AccessController {
                 }
             }
         }
+
         request().setAttribute("vote", v);
         request().setAttribute("cmpetitors", competitors);
         return "/wap/votes/detail";
@@ -103,11 +109,8 @@ public class VoteController extends AccessController {
     @RequestMapping("baoming/{voteId}")
     public String baoming(@PathVariable Long voteId) {
         Vote v = voteRepo.findByIdAndStatus(voteId, Status.ACTIVE);
-        if(v == null) {
-            return "/wap/votes/error";
-        }
         /* 开始投票后，系统将停止报名 */
-        if(!v.isFinished()) {
+        if(v == null || !v.isFinished()) {
             return "/wap/votes/error";
         }
         request().setAttribute("vote", v);
@@ -119,26 +122,20 @@ public class VoteController extends AccessController {
     @ResponseBody
     public Object baoming(@PathVariable Long vid, CompetitorForm form) {
         Vote v = voteRepo.findByIdAndStatus(vid, Status.ACTIVE);
-        if(v == null) {
-            return failure("活动不存在");
-        }
-        if(!v.isFinished()) {
+        if(v == null || !v.isFinished()) {
             return failure("报名已关闭!");
         }
+
+        Competitor oc = competitorRepo.findByPhone(form.getPhone());
+        if(oc != null) {
+            return failure("您已经报过名了!");
+        }
+
         Competitor c = new Competitor();
         c.setName(form.getName());
         c.setSex(form.getSex());
         c.setPhone(form.getPhone());
-        Competitor oc = competitorRepo.findByPhone(c.getPhone());
-        if(oc == null) {
-            c = competitorRepo.save(c);
-        } else {
-            c.setId(oc.getId());
-        }
-
-        if(v.getCompetitors().contains(c)) {
-            return failure("您已经报过名了!");
-        }
+        c = competitorRepo.save(c);
 
         v.addCompetitor(c);
         voteRepo.save(v);
@@ -149,17 +146,15 @@ public class VoteController extends AccessController {
     @RequestMapping("/vote/{voteId}/competitor/{competitorId}")
     public String votePage(@PathVariable Long voteId,@PathVariable Long competitorId) {
         Vote v = voteRepo.findByIdAndStatus(voteId, Status.ACTIVE);
-        if(v == null) {
+        if(v == null || v.isFinished()) {
             return "/wap/votes/error";
         }
-        if(v.isFinished()) {
-            return "/wap/votes/error";
-        }
+
         Competitor c = competitorRepo.findOne(competitorId);
         if(c == null) {
             return "/wap/votes/error";
         }
-        DecimalFormat df = new DecimalFormat("######0.00");  
+        DecimalFormat df = new DecimalFormat(Constants.DECIMAL_FORMAT);  
         VoteResult vr = voteResultRepo.findByVoteAndCompetitor(v, c);
         if(vr != null) {
             c.setCheckInCount(vr.getCheckInCount());
@@ -180,135 +175,83 @@ public class VoteController extends AccessController {
     }
 
     /**
-     * 赞成票
+     * 投票
      */
-    @RequestMapping(value = "/addIn/{voteId}/{competitorId}/{phone}", method = RequestMethod.POST)
+    @RequestMapping(value = "/voting", method = RequestMethod.POST)
     @ResponseBody
-    public Object addIn(@PathVariable Long voteId, @PathVariable Long competitorId, @PathVariable String phone) {
-        Vote v = voteRepo.findByIdAndStatus(voteId, Status.ACTIVE);
-
-        Competitor c = competitorRepo.findOne(competitorId);
-        VoteResult vr = testVote(v, c);
-        if(vr == null) {
-            return failure("表决失败");
-        }
-
-        if(v.isFinished()) {
+    public Object voting(VotingForm voteForm) {
+        /** 判断活动是否关闭 **/
+        Vote v = voteRepo.findByIdAndStatus(voteForm.getVoteId(), Status.ACTIVE);
+        if(v == null || v.isFinished()) {
             return failure("表决通过关闭");
         }
 
-        VoteRecord vrc = voteRecordRepo.findByVoteAndCompetitorAndPhone(v, c, phone);
-        if(vrc != null) {
-            return failure("您已经表决过了");
+        /** 验证参数 **/
+        Competitor c = competitorRepo.findOne(voteForm.getCompetitorId());
+        VoteResult vr = verifyParameter(v, c, voteForm);
+        if(vr == null) {
+            return failure("表决失败,参数有误或者您已经表决过了！");
         }
-        vrc = new VoteRecord(v, c, phone);
+
+        /** 新增投票记录 **/
+        VoteRecord vrc = new VoteRecord(v, c, voteForm.getPhone());
         vrc.setCheckIn(true);
         voteRecordRepo.save(vrc);
 
         // TODO ：枷锁，考虑并发
-        vr.setCheckInCount(vr.getCheckInCount() + 1);
+        switch(voteForm.getVoteType()) {
+            case Constants.VOTE_TYPE_CHECK:
+                if(voteForm.isAddIn()) {
+                    vr.setCheckInCount(vr.getCheckInCount() + 1);
+                } else if(voteForm.isAddOut()) {
+                    vr.setCheckInCount(vr.getCheckOutCount() + 1);
+                }
+                break;
+            case Constants.VOTE_TYPE_VOTE:
+                vr.setVoteCount(vr.getVoteCount() + 1);
+                break;
+            case Constants.VOTE_TYPE_SCORE:
+                if(vr.getScoreCount() == null || vr.getScoreCount() == 0) {
+                    vr.setScoreCount(Double.valueOf(voteForm.getScore()));
+                } else {
+                    vr.setScoreCount(vr.getScoreCount() + Double.valueOf(voteForm.getScore()));
+                }
+                //记录投票次数，用户计算平均分
+                vr.setVoteTimes(vr.getVoteTimes() + 1);
+                break;
+            default:
+                break;
+        }
         voteResultRepo.save(vr);
 
         return ok("表决成功");
     }
 
     /**
-     * 反对票
+     * 验证投票请求参数
+     * @param v 活动
+     * @param c 选手
+     * @param phone 投票者电话
+     * @return 投票记录（如果参数不合法，则返回null）
      */
-    @RequestMapping(value = "/addOut/{voteId}/{competitorId}/{phone}", method = RequestMethod.POST)
-    @ResponseBody
-    public Object addOut(@PathVariable Long voteId, @PathVariable Long competitorId, @PathVariable String phone) {
-        Vote v = voteRepo.findByIdAndStatus(voteId, Status.ACTIVE);
-        Competitor c = competitorRepo.findOne(competitorId);
-        VoteResult vr = testVote(v, c);
-        if(vr == null) {
-            return ok("表决失败");
-        }
-        if(v.isFinished()) {
-            return failure("表决通过关闭");
-        }
-        VoteRecord vrc = voteRecordRepo.findByVoteAndCompetitorAndPhone(v, c, phone);
-        if(vrc != null) {
-            return failure("您已经表决过了");
-        }
-        vrc = new VoteRecord(v, c, phone);
-        vrc.setCheckOut(true);
-        voteRecordRepo.save(vrc);
-        // TODO ：枷锁，考虑并发
-        vr.setCheckOutCount(vr.getCheckOutCount() + 1);
-        voteResultRepo.save(vr);
-        return ok("表决成功");
-    }
-
-    /**
-     * 投票
-     */
-    @RequestMapping(value = "/addVote/{voteId}/{competitorId}/{phone}", method = RequestMethod.POST)
-    @ResponseBody
-    public Object addVote(@PathVariable Long voteId, @PathVariable Long competitorId, @PathVariable String phone) {
-        Vote v = voteRepo.findByIdAndStatus(voteId, Status.ACTIVE);
-        Competitor c = competitorRepo.findOne(competitorId);
-        VoteResult vr = testVote(v, c);
-        if(vr == null) {
-            return ok("表决失败");
-        }
-        if(v.isFinished()) {
-            return failure("表决通过关闭");
-        }
-        VoteRecord vrc = voteRecordRepo.findByVoteAndCompetitorAndPhone(v, c, phone);
-        if(vrc != null) {
-            return failure("您已经表决过了");
-        }
-        vrc = new VoteRecord(v, c, phone);
-        vrc.setVoting(true);
-        voteRecordRepo.save(vrc);
-        // TODO ：枷锁，考虑并发
-        vr.setVoteCount(vr.getVoteCount() + 1);
-        voteResultRepo.save(vr);
-        return ok("表决成功");
-    }
-
-    /**
-     * 打分票
-     */
-    @RequestMapping(value = "/addScore/{voteId}/{competitorId}/{score}/{phone}", method = RequestMethod.POST)
-    @ResponseBody
-    public Object addScore(@PathVariable Long voteId, @PathVariable Long competitorId, @PathVariable String score, @PathVariable String phone) {
-        Vote v = voteRepo.findByIdAndStatus(voteId, Status.ACTIVE);
-        Competitor c = competitorRepo.findOne(competitorId);
-        VoteResult vr = testVote(v, c);
-        if(vr == null || Double.valueOf(score) > v.getScoreSystem()) {
-            return ok("表决失败,请填写正确的参数");
-        }
-        if(v.isFinished()) {
-            return failure("表决通过关闭");
-        }
-        VoteRecord vrc = voteRecordRepo.findByVoteAndCompetitorAndPhone(v, c, phone);
-        if(vrc != null) {
-            return failure("您已经表决过了");
-        }
-        vrc = new VoteRecord(v, c, phone);
-        vrc.setScore(true);
-        voteRecordRepo.save(vrc);
-        // TODO ：枷锁，考虑并发
-        if(vr.getScoreCount() == null || vr.getScoreCount() == 0) {
-            vr.setScoreCount(Double.valueOf(score));
-        } else {
-            vr.setScoreCount(vr.getScoreCount() + Double.valueOf(score));
-        }
-        vr.setVoteTimes(vr.getVoteTimes() + 1);
-        voteResultRepo.save(vr);
-        return ok("表决成功");
-    }
-
-    public VoteResult testVote(Vote v, Competitor c) {
-        if(v == null || c == null) {
+    public VoteResult verifyParameter(Vote v, Competitor c, VotingForm voteForm) {
+        if(v == null || c == null || voteForm == null || voteForm.getPhone() == null) {
             return null;
         }
-        // TODO: 对投票的人进行判断
-        // TODO: 对投票的人进行判断
-        // TODO: 对投票的人进行判断
-        // TODO: 对投票的人进行判断
+        Pattern p = Pattern.compile(Constants.VALIDATE_PATTERN_PHONE);
+        Matcher m = p.matcher(voteForm.getPhone());
+        if(!m.matches()) {
+            return null;
+        }
+        VoteRecord vrc = voteRecordRepo.findByVoteAndCompetitorAndPhone(v, c, voteForm.getPhone());
+        if(vrc != null) {
+            return null;
+        }
+        /** 针对打分类的投票活动进行判断 **/
+        if(voteForm.getVoteType() != null && voteForm.getVoteType().equals(Constants.VOTE_TYPE_SCORE) && voteForm.getScore() > v.getScoreSystem()) {
+            return null;
+        }
+
         VoteResult vr = voteResultRepo.findByVoteAndCompetitor(v, c);
         if(vr == null) {
             vr = new VoteResult();

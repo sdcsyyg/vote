@@ -16,9 +16,15 @@ $(document).ready(function() {
             return;
         }
 
-        var url = '/wap/votes/addScore/' + voteId + '/' + competitorId + '/' + score + '/' + phone;
+        var url = '/wap/votes/voting';
 
-        $.post(url, null, function(result) {
+        $.post(url, {
+            voteId: voteId,
+            competitorId: competitorId,
+            score: score,
+            voteType: 'SCORE',
+            phone: phone
+        }, function(result) {
             alert(result.msg);
             if(result.success) {
                 location.href = '/wap/votes/vote/' + voteId + '/competitor/' + competitorId;
@@ -39,9 +45,15 @@ $(document).ready(function() {
             return;
         }
 
-        var url = '/wap/votes/addIn/' + voteId + '/' + competitorId + '/' + phone;
+        var url = '/wap/votes/voting';
 
-        $.post(url, null, function(result) {
+        $.post(url, {
+            voteId: voteId,
+            competitorId: competitorId,
+            voteType: 'CHECK',
+            addIn: true,
+            phone: phone
+        }, function(result) {
             alert(result.msg);
             if(result.success) {
                 location.href = '/wap/votes/vote/' + voteId + '/competitor/' + competitorId;
@@ -62,9 +74,15 @@ $(document).ready(function() {
             return;
         }
 
-        var url = '/wap/votes/addOut/' + voteId + '/' + competitorId + '/' + phone;
+        var url = '/wap/votes/voting';
 
-        $.post(url, null, function(result) {
+        $.post(url, {
+            voteId: voteId,
+            competitorId: competitorId,
+            voteType: 'CHECK',
+            addOut: true,
+            phone: phone
+        }, function(result) {
             alert(result.msg);
             if(result.success) {
                 location.href = '/wap/votes/vote/' + voteId + '/competitor/' + competitorId;
@@ -85,9 +103,14 @@ $(document).ready(function() {
             return;
         }
 
-        var url = '/wap/votes/addVote/' + voteId + '/' + competitorId + '/' + phone;
+        var url = '/wap/votes/voting';
 
-        $.post(url, null, function(result) {
+        $.post(url, {
+            voteId: voteId,
+            competitorId: competitorId,
+            voteType: 'VOTE',
+            phone: phone
+        }, function(result) {
             alert(result.msg);
             if(result.success) {
                 location.href = '/wap/votes/vote/' + voteId + '/competitor/' + competitorId;

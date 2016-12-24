@@ -16,6 +16,7 @@ public class VoteResult extends AbstractModel {
     @ManyToOne
     private Competitor competitor;
 
+
     /** 赞成票数 **/
     private long checkInCount = 0L;
 

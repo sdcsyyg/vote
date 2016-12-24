@@ -7,6 +7,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.kusion.vote.common.configs.Constants;
 import com.kusion.vote.common.models.AbstractModel;
 
 @Entity
@@ -114,6 +115,28 @@ public class Competitor extends AbstractModel {
 
     public void setVotes(List<Vote> votes) {
         this.votes = votes;
+    }
+
+    public long compareTo(Competitor that, String voteType) {
+        if(voteType == null || "".equals(voteType)) {
+            return 0;
+        }
+
+        switch (voteType) {
+            case Constants.VOTE_TYPE_CHECK:
+                return this.getCheckInCount() - that.getCheckInCount();
+            case Constants.VOTE_TYPE_VOTE:
+                return this.getVoteCount() - that.getVoteCount();
+            case Constants.VOTE_TYPE_SCORE:
+                if(this.getAverage() > that.getAverage()) {
+                    return 1;
+                }
+                break;
+            default:
+                return 0;
+        }
+
+        return 0;
     }
 
 }

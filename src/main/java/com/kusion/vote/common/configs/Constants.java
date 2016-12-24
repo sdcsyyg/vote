@@ -50,25 +50,16 @@ public class Constants {
     ///////////////////////
     public static final String SETTING_KEY_SEO = "_SETTINGS_SEO";
 
-    ///////////////////////
-    // 分类配置
-    ///////////////////////
-    public static final String CATEGORY_TYPE_HOUSE = "HOUSE";
-
-    public static final String CATEGORY_HOUSE_XINFANG = "XINFANG";
-    public static final String CATEGORY_HOUSE_ERSHOUFANG = "ERSHOUFANG";
-    public static final String CATEGORY_HOUSE_ZUFANG = "ZUFANG";
-    public static final String CATEGORY_HOUSE_QITAFANG = "QITAFANG";
-    public static final String CATEGORY_HOUSE_SHOULOUBU = "SHOULOUBU";
-
-    public static final String CATEGORY_COMPANY_ZXJZ = "ZXJZ";
-    public static final String CATEGORY_COMPANY_YXQY = "YXQY";
-    public static final String CATEGORY_COMPANY_SLB = "SLB";
-
     public static final String IMAGE_DEFAULT = "http://123.57.86.101/assets/images/default.png";
 
     public static final String VALIDATE_PATTERN_PHONE = "^1\\d{10}$";
     public static final long DEFAULT_EXP_TIME = 20L;
     public static final int REMEMBER_ME_DAYS = 30;
+
+    public static final String VOTE_TYPE_CHECK = "CHECK";
+    public static final String VOTE_TYPE_VOTE = "VOTE";
+    public static final String VOTE_TYPE_SCORE = "SCORE";
+
+    public static final String DECIMAL_FORMAT = "######0.00";
 
 }
