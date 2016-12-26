@@ -180,49 +180,58 @@ public class VoteController extends AccessController {
     @RequestMapping(value = "/voting", method = RequestMethod.POST)
     @ResponseBody
     public Object voting(VotingForm voteForm) {
-        /** 判断活动是否关闭 **/
+        /** 第一：判断活动是否关闭 **/
         Vote v = voteRepo.findByIdAndStatus(voteForm.getVoteId(), Status.ACTIVE);
         if(v == null || v.isFinished()) {
             return failure("表决通过关闭");
         }
 
-        /** 验证参数 **/
+        /** 第二：验证参数 **/
         Competitor c = competitorRepo.findOne(voteForm.getCompetitorId());
         VoteResult vr = verifyParameter(v, c, voteForm);
         if(vr == null) {
             return failure("表决失败,参数有误或者您已经表决过了！");
         }
 
-        /** 新增投票记录 **/
-        VoteRecord vrc = new VoteRecord(v, c, voteForm.getPhone());
-        vrc.setCheckIn(true);
-        voteRecordRepo.save(vrc);
-
-        // TODO ：枷锁，考虑并发
-        switch(voteForm.getVoteType()) {
-            case Constants.VOTE_TYPE_CHECK:
-                if(voteForm.isAddIn()) {
-                    vr.setCheckInCount(vr.getCheckInCount() + 1);
-                } else if(voteForm.isAddOut()) {
-                    vr.setCheckOutCount(vr.getCheckOutCount() + 1);
-                }
-                break;
-            case Constants.VOTE_TYPE_VOTE:
-                vr.setVoteCount(vr.getVoteCount() + 1);
-                break;
-            case Constants.VOTE_TYPE_SCORE:
-                if(vr.getScoreCount() == null || vr.getScoreCount() == 0) {
-                    vr.setScoreCount(Double.valueOf(voteForm.getScore()));
-                } else {
-                    vr.setScoreCount(vr.getScoreCount() + Double.valueOf(voteForm.getScore()));
-                }
-                //记录投票次数，用户计算平均分
-                vr.setVoteTimes(vr.getVoteTimes() + 1);
-                break;
-            default:
-                break;
+        /** 第三：将vr加锁，修改投票结果 **/
+        synchronized(vr){
+            VoteRecord vrc = new VoteRecord(v, c, voteForm.getPhone());
+            switch(voteForm.getVoteType()) {
+                case Constants.VOTE_TYPE_CHECK:
+                    if(voteForm.isAddIn()) {
+                        vr.setCheckInCount(vr.getCheckInCount() + 1);
+                        vrc.setCheckIn(true);
+                    } else if(voteForm.isAddOut()) {
+                        vr.setCheckOutCount(vr.getCheckOutCount() + 1);
+                        vrc.setCheckOut(true);
+                    }
+                    break;
+                case Constants.VOTE_TYPE_VOTE:
+                    vr.setVoteCount(vr.getVoteCount() + 1);
+                    vrc.setVoting(true);
+                    break;
+                case Constants.VOTE_TYPE_SCORE:
+                    if(vr.getScoreCount() == null || vr.getScoreCount() == 0) {
+                        vr.setScoreCount(Double.valueOf(voteForm.getScore()));
+                    } else {
+                        vr.setScoreCount(vr.getScoreCount() + Double.valueOf(voteForm.getScore()));
+                    }
+                    //记录投票次数，用户计算平均分
+                    vr.setVoteTimes(vr.getVoteTimes() + 1);
+                    vrc.setScore(true);
+                    break;
+                default:
+                    break;
+            }
+            try {
+                voteResultRepo.save(vr);
+            } catch (Exception e) {
+                return failure("表决失败,操作过于频繁，请稍后重试！");
+            } finally {
+                /** 第四：新增投票记录 **/
+                voteRecordRepo.save(vrc);
+            }
         }
-        voteResultRepo.save(vr);
 
         return ok("表决成功");
     }
